@@ -371,7 +371,7 @@ class Reviews_Youtuber():
         self.timestamp4= None 
         self.timestamp5= None 
         self.timestamp6= None 
-        self.timestamp1= None
+        self.timestamp1_description= None 
         self.timestamp2_description= None 
         self.timestamp3_description= None 
         self.timestamp4_description= None 
@@ -391,18 +391,75 @@ class Reviews_Youtuber():
         result_dict["reviews"]["youtuber"]["review_video"]["title"]=self.title
         result_dict["reviews"]["youtuber"]["review_video"]["views"]=self.views
         result_dict["reviews"]["youtuber"]["review_video"]["time_since_upload"]=self.time_since_upload
-        result_dict["reviews"]["youtuber"]["review_video"]["highlight_timestamp"]["timestamp1"]=self.timestamp1+ " : "+self.timestamp1_description
-        result_dict["reviews"]["youtuber"]["review_video"]["highlight_timestamp"]["timestamp2"]=self.timestamp2+ " : "+self.timestamp2_description
-        result_dict["reviews"]["youtuber"]["review_video"]["highlight_timestamp"]["timestamp3"]=self.timestamp3+ " : "+self.timestamp3_description
-        result_dict["reviews"]["youtuber"]["review_video"]["highlight_timestamp"]["timestamp4"]=self.timestamp4+ " : "+self.timestamp4_description
-        result_dict["reviews"]["youtuber"]["review_video"]["highlight_timestamp"]["timestamp5"]=self.timestamp5+ " : "+self.timestamp5_description
-        result_dict["reviews"]["youtuber"]["review_video"]["highlight_timestamp"]["timestamp6"]=self.timestamp6+ " : "+self.timestamp6_description
+        result_dict["reviews"]["youtuber"]["review_video"]["highlight_timestamp"]["timestamp1"]=self.timestamp1 + " : "+ self.timestamp1_description
+        result_dict["reviews"]["youtuber"]["review_video"]["highlight_timestamp"]["timestamp2"]=self.timestamp2 + " : "+ self.timestamp2_description
+        result_dict["reviews"]["youtuber"]["review_video"]["highlight_timestamp"]["timestamp3"]=self.timestamp3 + " : "+ self.timestamp3_description
+        result_dict["reviews"]["youtuber"]["review_video"]["highlight_timestamp"]["timestamp4"]=self.timestamp4 + " : "+ self.timestamp4_description
+        result_dict["reviews"]["youtuber"]["review_video"]["highlight_timestamp"]["timestamp5"]=self.timestamp5 + " : "+ self.timestamp5_description
+        result_dict["reviews"]["youtuber"]["review_video"]["highlight_timestamp"]["timestamp6"]=self.timestamp6 + " : "+ self.timestamp6_description
         result_dict["reviews"]["youtuber"]["opinion"]=self.opinion
         result_dict["reviews"]["youtuber"]["opinion_reason"]=self.opinion_reason
         result_dict["reviews"]["youtuber"]["pros"]=self.pros
         result_dict["reviews"]["youtuber"]["cons"]=self.cons
         result_dict["reviews"]["youtuber"]["link"]=self.link
         return result_dict
+    
+    def process_dict(self, result_dict, mode="set"):
+        """
+        mode="set": 플래트 딕셔너리 (키가 "youtuber.attribute" 형태)로 인스턴스의 속성을 업데이트합니다.
+        mode="get": 인스턴스의 속성값을 바탕으로 중첩된 딕셔너리 구조를 반환합니다.
+        """
+        if mode == "set":
+            prefix = "youtuber."
+            for key, value in result_dict.items():
+                if key.startswith(prefix):
+                    attr_name = key[len(prefix):]
+                else:
+                    attr_name = key
+                if hasattr(self, attr_name):
+                    setattr(self, attr_name, value)
+                else:
+                    print(f"Warning: '{attr_name}' 속성이 클래스에 없습니다.")
+            # 업데이트 후, self를 반환할 수도 있음.
+            return self
+        elif mode == "get":
+            # 중첩된 딕셔너리 구조로 결과를 생성
+            output = {
+                "reviews": {
+                    "youtuber": {
+                        "name": self.name,
+                        "subscribers": self.subscribers,
+                        "review_video": {
+                            "title": self.title,
+                            "views": self.views,
+                            "time_since_upload": self.time_since_upload,
+                            "highlight_timestamp": {
+                                "timestamp1": f"{self.timestamp1} : {self.timestamp1_description}",
+                                "timestamp2": f"{self.timestamp2} : {self.timestamp2_description}",
+                                "timestamp3": f"{self.timestamp3} : {self.timestamp3_description}",
+                                "timestamp4": f"{self.timestamp4} : {self.timestamp4_description}",
+                                "timestamp5": f"{self.timestamp5} : {self.timestamp5_description}",
+                                "timestamp6": f"{self.timestamp6} : {self.timestamp6_description}"
+                            }
+                        },
+                        "opinion": self.opinion,
+                        "opinion_reason": self.opinion_reason,
+                        "pros": self.pros,
+                        "cons": self.cons,
+                        "link": self.link
+                    }
+                }
+            }
+            return output
+        else:
+            raise ValueError("mode 인자는 'set' 또는 'get'이어야 합니다.")
+
+ 
+    
+    
+    
+    
+    
 class Reviews_General_Users():
     def __init__(self):
         self.total_reviews = None
@@ -480,3 +537,42 @@ class Purchase_Info_Stores():
         return result_dict
             
         
+class Youtuber:
+    def __init__(self,input):
+        self.name = None
+        self.subscribers = None
+        self.title = None
+        self.views = None
+        self.time_since_upload = None
+        self.timestamp1 = None
+        self.timestamp2 = None
+        self.timestamp3 = None
+        self.timestamp4 = None
+        self.timestamp5 = None
+        self.timestamp6 = None
+        self.timestamp1_description = None
+        self.timestamp2_description = None
+        self.timestamp3_description = None
+        self.timestamp4_description = None
+        self.timestamp5_description = None
+        self.timestamp6_description = None
+        self.opinion = None
+        self.opinion_reason = None
+        self.pros = None
+        self.cons = None
+        self.link = None
+
+    def set_value(self, result_dict):
+        # result_dict 의 키는 "youtuber.attribute" 형태입니다.
+        prefix = "youtuber."
+        for key, value in result_dict.items():
+            # 접두사가 있다면 제거하여 실제 속성 이름을 얻습니다.
+            if key.startswith(prefix):
+                attr_name = key[len(prefix):]
+            else:
+                attr_name = key
+            # 해당 속성이 클래스에 존재하면 할당
+            if hasattr(self, attr_name):
+                setattr(self, attr_name, value)
+            else:
+                print(f"Warning: '{attr_name}' 속성이 클래스에 없습니다.")

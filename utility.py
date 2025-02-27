@@ -9,11 +9,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.callbacks import get_openai_callback
 from pprint import pprint
 warnings.filterwarnings("ignore")
-from queue_manager import add_log
-globalist=[]
-def log_wrapper(log_message):
-    globalist.append(log_message)
-    add_log(log_message)  
+
 
 
 class APIcontroller:
@@ -24,14 +20,14 @@ class APIcontroller:
         self.model=None
         if not self.UPSTAGE_API_KEY:
             self.UPSTAGE_API_KEY = None
-            log_wrapper("Upstage API is None")
+            print("Upstage API is None")
         else:
-            log_wrapper("Upstage API key is successfully set.")
+            print("Upstage API key is successfully set.")
         if not self.OPENAI_API_KEY:
             self.OPENAI_API_KEY = None
-            log_wrapper("OpenAi API is None")
+            print("OpenAi API is None")
         else:
-            log_wrapper("<<::STATE::api_initialized>>OpenAi API key is successfully set.")
+            print("<<::STATE::api_initialized>>OpenAi API key is successfully set.")
 
     def get_llm_model(self,llmmodel,model='openai'):
         if model == 'upstage' and self.UPSTAGE_API_KEY:
@@ -49,9 +45,9 @@ class APIcontroller:
             self.model =[model,llmmodel]
             return llm
         else:
-            log_wrapper("Not available any model")
+            print("Not available any model")
             return None
-        log_wrapper("Not available any model")
+        print("Not available any model")
         return None
     def get_prompt_raw(self,input_prompt) -> ChatPromptTemplate:
         """
@@ -136,19 +132,19 @@ class Node:
         return out, token
     def change_context(self,context):
         if self.llm == 'endnode':
-            log_wrapper("This is endnode if you change context, it is not working")
+            print("This is endnode if you change context, it is not working")
         self.context = context
     def change_raw_prompt(self,prompt):
         if self.llm == 'endnode':
-            log_wrapper("This is endnode so you can't change prompt")
+            print("This is endnode so you can't change prompt")
         self.prompt = self.controller.get_prompt_raw(prompt)
     def change_prompt(self,prompt):
         if self.llm == 'endnode':
-            log_wrapper("This is endnode so you can't change prompt")
+            print("This is endnode so you can't change prompt")
         self.prompt = self.controller.get_prompt(prompt)
     def change_llm(self,llm):
         if self.llm == 'endnode':
-            log_wrapper("This is endnode so you can't change llm")
+            print("This is endnode so you can't change llm")
         self.llm = llm
     def get_prompt(self):
         if self.llm == 'endnode':
