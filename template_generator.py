@@ -259,6 +259,7 @@ class Product_recommendation():
         result_dict["product"]["name"]=self.name
         result_dict["product"]["category"]=self.category
         return result_dict
+
 class Secifications_Display():
     def __init__(self):
         self.size = None
@@ -391,6 +392,31 @@ class Reviews_Youtuber():
         result_dict["reviews"]["youtuber"]["review_video"]["title"]=self.title
         result_dict["reviews"]["youtuber"]["review_video"]["views"]=self.views
         result_dict["reviews"]["youtuber"]["review_video"]["time_since_upload"]=self.time_since_upload
+        if not self.timestamp1:
+            self.timestamp1=""
+        if not self.timestamp2:
+            self.timestamp2=""
+        if not self.timestamp3:
+            self.timestamp3=""
+        if not self.timestamp4:
+            self.timestamp4=""
+        if not self.timestamp5:
+            self.timestamp5=""
+        if not self.timestamp6:
+            self.timestamp6=""
+        if not self.timestamp1_description:
+            self.timestamp1_description=""
+        if not self.timestamp2_description:
+            self.timestamp2_description=""
+        if not self.timestamp3_description:
+            self.timestamp3_description=""
+        if not self.timestamp4_description:
+            self.timestamp4_description=""
+        if not self.timestamp5_description:
+            self.timestamp5_description=""
+        if not self.timestamp6_description:
+            self.timestamp6_description=""
+        
         result_dict["reviews"]["youtuber"]["review_video"]["highlight_timestamp"]["timestamp1"]=self.timestamp1 + " : "+ self.timestamp1_description
         result_dict["reviews"]["youtuber"]["review_video"]["highlight_timestamp"]["timestamp2"]=self.timestamp2 + " : "+ self.timestamp2_description
         result_dict["reviews"]["youtuber"]["review_video"]["highlight_timestamp"]["timestamp3"]=self.timestamp3 + " : "+ self.timestamp3_description
@@ -413,7 +439,7 @@ class Reviews_Youtuber():
             prefix = "youtuber."
             for key, value in result_dict.items():
                 if key.startswith(prefix):
-                    attr_name = key[len(prefix):]
+                    attr_name = key[len(prefix):].replace('.','')
                 else:
                     attr_name = key
                 if hasattr(self, attr_name):
@@ -479,6 +505,41 @@ class Reviews_General_Users():
         result_dict["reviews"]["general_users"]["negative_reviews"]=self.negative_reviews
         result_dict["reviews"]["general_users"]["user_comments"]=self.user_comments
         return result_dict
+    def process_dict(self, result_dict, mode="set"):
+        """
+        mode="set": 플래트 딕셔너리 (키가 "reviews.attribute" 형태)로 인스턴스의 속성을 업데이트합니다.
+        mode="get": 인스턴스의 속성값을 바탕으로 중첩된 딕셔너리 구조를 반환합니다.
+        """
+        if mode == "set":
+            prefix = "general_users"
+            for key, value in result_dict.items():
+                if key.startswith(prefix):
+                    attr_name = key[len(prefix):].replace('.','')
+                else:
+                    attr_name = key
+                if hasattr(self, attr_name):
+                    setattr(self, attr_name, value)
+                else:
+                    print(f"Warning: '{attr_name}' 속성이 클래스에 없습니다.")
+            # 업데이트 후, self를 반환할 수도 있음.
+            return self
+        elif mode == "get":
+            # 중첩된 딕셔너리 구조로 결과를 생성
+            output = {
+                "reviews": {
+                    "general_users": {  "total_reviews": self.total_reviews,
+                                        "positive_percentage": self.positive_percentage,
+                                        "negative_percentage": self.negative_percentage,
+                                        "positive_reviews": self.positive_reviews,
+                                        "negative_reviews": self.negative_reviews,
+                                        "user_comments": self.user_comments
+                                        }
+                                        
+                            }
+            }
+            return output
+        else:
+            raise ValueError("mode 인자는 'set' 또는 'get'이어야 합니다.")
 
 
 class Product():
@@ -498,15 +559,74 @@ class Product():
         return "recommendation,specifications_display,specifications_processor,specifications_storage,specifications_battery,specifications_design,specifications_color_options,specifications_pencil_support,specifications_charging_port"
     def set_value(self,result_dict):
         self.recommendation.set_value(result_dict)
-        self.specifications_display.set_value(result_dict)
-        self.specifications_processor.set_value(result_dict)
-        self.specifications_storage.set_value(result_dict)
-        self.specifications_battery.set_value(result_dict)
-        self.specifications_design.set_value(result_dict)
-        self.specifications_color_options.set_value(result_dict)
-        self.specifications_pencil_support.set_value(result_dict)
-        self.specifications_charging_port.set_value(result_dict)
+        self.display.set_value(result_dict)
+        self.processor.set_value(result_dict)
+        self.storage.set_value(result_dict)
+        self.battery.set_value(result_dict)
+        self.design.set_value(result_dict)
+        self.color_options.set_value(result_dict)
+        self.pencil_support.set_value(result_dict)
+        self.charging_port.set_value(result_dict)
         return result_dict
+    def process_dict(self, flat_dict):
+        """
+        flat_dict의 키는 "키접두어.속성" 형태입니다.
+        예: "specifications_display.size" 또는 "recommendation.name"
+        
+        Product 클래스 내부에는 다음 멤버가 있습니다:
+            - recommendation
+            - display
+            - processor
+            - storage
+            - battery
+            - design
+            - color_options
+            - pencil_support
+            - charging_port
+        
+        만약 flat_dict의 키 접두어가 실제 멤버명과 다르다면, 아래 mapping을 통해 변환합니다.
+        """
+        mapping = {
+            "recommendation": "recommendation",
+            "specifications_display": "display",
+            "display": "display",
+            "specifications_processor": "processor",
+            "processor": "processor",
+            "specifications_storage": "storage",
+            "storage": "storage",
+            "specifications_battery": "battery",
+            "battery": "battery",
+            "specifications_design": "design",
+            "design": "design",
+            "specifications_color_options": "color_options",
+            "color_options": "color_options",
+            "specifications_pencil_support": "pencil_support",
+            "pencil_support": "pencil_support",
+            "specifications_charging_port": "charging_port",
+            "charging_port": "charging_port"
+        }
+        
+        for key, value in flat_dict.items():
+            parts = key.split(".", 1)
+            if len(parts) != 2:
+                print(f"Warning: Key '{key}' does not follow the 'subobject.attribute' format.")
+                continue
+            sub_key, attr_name = parts
+            # 변환 매핑을 통해 실제 멤버 이름을 얻습니다.
+            if sub_key in mapping:
+                obj_attr = mapping[sub_key]
+            else:
+                obj_attr = sub_key  # 매핑이 없으면 그대로 사용
+            if hasattr(self, obj_attr):
+                sub_obj = getattr(self, obj_attr)
+                if hasattr(sub_obj, attr_name):
+                    setattr(sub_obj, attr_name, value)
+                else:
+                    print(f"Warning: '{obj_attr}' object has no attribute '{attr_name}'.")
+            else:
+                print(f"Warning: Product has no sub-object named '{obj_attr}'.")
+        return self
+
 class Reviews():
     def __init__(self):
         self.youtuber = Reviews_Youtuber()
@@ -568,7 +688,7 @@ class Youtuber:
         for key, value in result_dict.items():
             # 접두사가 있다면 제거하여 실제 속성 이름을 얻습니다.
             if key.startswith(prefix):
-                attr_name = key[len(prefix):]
+                attr_name = key[len(prefix):].replace('.','')
             else:
                 attr_name = key
             # 해당 속성이 클래스에 존재하면 할당
