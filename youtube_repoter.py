@@ -95,7 +95,20 @@ async def test_youtube_main():
         print(e)
         print(f"오류가 발생했습니다.반환값:{result[0]}")
     return youtuber, result
-        
+async def youtube_main(input):
+    repoter=YoutubeRepoter(input)
+    result,response=repoter.get_response()
+    item_review=Reviews()
+    youtuber=item_review.youtuber
+    try:
+        youtuber.process_dict(result[0])
+    except Exception as e:
+        print(e)
+        print(f"오류가 발생했습니다.반환값:{result[0]}")
+    return youtuber, result
+
+
+
 if __name__ == "__main__":
     youtuber, result=test_youtube_main()
     generator = ResultTemplate()

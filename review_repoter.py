@@ -94,6 +94,19 @@ async def test_review_main():
     general_users=item_review.general_users
     general_users.process_dict(data)
     return general_users, []
+
+async def review_main(input):
+    repoter=ReviewRepoter(input)
+    result,response=repoter.get_response()    
+    item_review=Reviews()
+    general_users=item_review.general_users
+    try:
+        general_users.process_dict(result[0])
+    except Exception as e:
+        print(e)
+        print(f"오류가 발생했습니다.반환값:{result[0]}")
+    return general_users, []
+
 if __name__ == "__main__":
     #input=get_test_dummy()
     #repoter=ReviewRepoter(input)

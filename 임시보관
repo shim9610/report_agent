@@ -1,0 +1,46 @@
+(.venv) ssy@ssy-MS-7E01:~/git/report_agent$  /usr/bin/env /home/ssy/git/.venv/bin/python /home/ssy/.vscode/extensions/ms-python.debugpy-2025.0.1-linux-x64/bundled/libs/debugpy/adapter/../../debugpy/launcher 52369 -- /home/ssy/git/report_agent/youtube_repoter.py 
+Upstage API key is successfully set.
+<<::STATE::api_initialized>>OpenAi API key is successfully set.
+현재 1번째 시도중입니다.
+질문 : ['제공된 데이터에서 아이패드의 디지털 드로잉에 적합한 제품 리뷰 영상에 대한 정보가 충분한가?', '유저가 요구한 기능 요약 및 인상적인 장면은 제공된 데이터에서 찾을 수 있는가?', '예산 100만원에 부합하는 제품 리뷰 영상의 정보가 포함되어 있지 않은가?']
+답변 : 현재 요청하신 내용에 맞는 정보를 확인할 수 없습니다. 제공된 데이터는 애플 펜슬의 리뷰와 관련된 내용으로, 아이패드에 대한 정보는 포함되어 있지만 요청하신 제품의 반응 속도와 프로세서에 대한 구체적인 리뷰는 없습니다.
+현재 2번째 시도중입니다.
+질문 : ['제공된 데이터에서 아이패드의 디지털 드로잉에 적합한 제품 리뷰 영상에 대한 정보가 충분한가?', '유저가 요구한 기능 요약 및 인상적인 장면은 제공된 데이터에서 찾을 수 있는가?', '예산 100만원에 부합하는 제품 리뷰 영상의 정보가 포함되어 있지 않은가?']
+현재 3번째 시도중입니다.
+질문 : ['제공된 데이터에서 아이패드의 디지털 드로잉에 적합한 제품 리뷰 영상에 대한 정보가 충분한가?', '유저가 요구한 기능 요약 및 인상적인 장면은 제공된 데이터에서 찾을 수 있는가?', '예산 100만원에 부합하는 제품 리뷰 영상의 정보가 포함되어 있지 않은가?']
+현재 4번째 시도중입니다.
+{'product': {'category': None,
+             'name': None,
+             'recommendation': {'bad_person': [], 'good_person': [], 'main_reason': None, 'sub_reason': None},
+             'specifications': {'battery': {'capacity': None, 'description': None},
+                                'charging_port': {'description': None, 'limitation': None, 'type': None},
+                                'color_options': [],
+                                'design': {'description': None, 'features': []},
+                                'display': {'description': None, 'refresh_rate': None, 'resolution': None, 'size': None},
+                                'pencil_support': {'charging': None, 'description': None, 'supported': None},
+                                'processor': {'description': None, 'equivalent': None, 'model': None},
+                                'storage': {'description': None, 'expandable': None, 'options': []}}},
+ 'purchase_info': {'stores': [{'option': None, 'price': None, 'purchase_link': None, 'rating': None, 'site': None},
+                              {'option': None, 'price': None, 'purchase_link': None, 'rating': None, 'site': None}]},
+ 'reviews': {'general_users': {'negative_percentage': None,
+                               'negative_reviews': [],
+                               'positive_percentage': None,
+                               'positive_reviews': [],
+                               'total_reviews': None,
+                               'user_comments': [{'comment': None, 'user': None}]},
+             'youtuber': {'cons': '["필압 감지가 지원되지 않음", "비싼 가격"',
+                          'link': 'https://www.youtube.com/watch?v=zkDlswmkyLE',
+                          'name': 'UNDERkg',
+                          'opinion': '추천하지 않음',
+                          'opinion_reason': '가격 대비 성능이 아쉬움',
+                          'pros': '["디자인이 우수함", "USB-C 충전 지원"',
+                          'review_video': {'highlight_timestamp': {'timestamp1': '00:00 : 인트로 및 제품 소개',
+                                                                   'timestamp2': '00:08 : 제품 개봉 및 디자인',
+                                                                   'timestamp3': '02:46 : 비교 및 성능 평가',
+                                                                   'timestamp4': '06:09 : 필기 감각 설명',
+                                                                   'timestamp5': '07:55 : 정리 및 최종 평가',
+                                                                   'timestamp6': '00:00 : 다른 제품과의 비교'},
+                                           'time_since_upload': '1 year ago',
+                                           'title': '막 나가는(?) 애플의 11만 9천원짜리 애플 펜슬 USB-C 사 왔습니다',
+                                           'views': '307K views'},
+                          'subscribers': '78.8만 명'}}}

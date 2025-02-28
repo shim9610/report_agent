@@ -139,8 +139,20 @@ async def test_sepcification_main():
     }
     item_product=Product()
     item_product.process_dict(flat_dict)
-
     return item_product, []
+async def sepcification_main(): 
+    repoter=SpecificationRepoter(input)
+    result,response=repoter.get_response()    
+    item_product=Product()
+    try:
+        item_product.process_dict(result[0])
+    except Exception as e:
+        print(e)
+        print(f"오류가 발생했습니다.반환값:{result[0]}")
+    return item_product, []
+
+
+
 
 if __name__ == "__main__":
     #input=get_test_dummy()
