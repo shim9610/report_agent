@@ -1,6 +1,5 @@
 from utility import Node
 import re
-from dummy import get_test_dummy
 from template_generator import ResultTemplate, Product, Reviews, Purchase_Info_Stores
 class BaseRepoter:
     def __init__(self,data,section1,section2,query,table_content,prompt,model,script,selfquestion,selfanswer,context):
@@ -101,4 +100,4 @@ class BaseRepoter:
         
         
 if __name__ == "__main__":
-    input=get_test_dummy()
+    input=0

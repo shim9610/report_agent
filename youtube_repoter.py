@@ -1,6 +1,6 @@
 from utility import Node
 import re
-from dummy import get_test_dummy
+from dummy import get_dummy
 from template_generator import ResultTemplate, Product, Reviews, Purchase_Info_Stores
 from bsae_repoter import BaseRepoter
 

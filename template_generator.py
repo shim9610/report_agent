@@ -655,6 +655,13 @@ class Purchase_Info_Stores():
                                             "purchase_link":self.purchase_link,
                                             "rating":self.rating}
         return result_dict
+    def process_dict(self, flat_dict):
+        self.price=flat_dict["price"]
+        self.site=flat_dict["site"]
+        self.option=flat_dict["option"]
+        self.purchase_link=flat_dict["purchase_link"]
+        self.rating=flat_dict["rating"]
+        
             
         
 class Youtuber:

@@ -21,21 +21,28 @@ class ReportAgent(BaseAgent):
         self.youtube_report=None
         self.review_report=None
         self.specification_report=None
+        self.purchase_report=None
+        self.last_report=None
         
     async def run(self, state: Dict[str, Any]) -> Dict[str, Any]:
-        data=input["middleware"]
+        data=state["middleware"]
         youtube_input=data["youtube"]
+        query=youtube_input["youtube"]["query"]
         review_input=data["review"]
         specification_input=data["specification"]
         
-        (youtube,result_y),(rewivew,result_r),(specification,result_s)=await asyncio.gather(
+        (youtube,result_y),(rewivew,result_r),(specification_out,result_s)=await asyncio.gather(
             youtube_main(youtube_input),
-            review_main(review_input),
-            sepcification_main(specification_input),  
+            review_main(review_input,query),
+            sepcification_main(specification_input,query),  
         )
+
+        specification=specification_out["Product"]
+        Purchase_Info=specification_out["Purchase"]
         self.youtube_report=youtube
         self.review_report=rewivew
         self.specification_report=specification
+        self.purchase_report=Purchase_Info
         self.repoterresponse["youtube"]=result_y
         self.repoterresponse["review"]=result_r
         self.repoterresponse["specification"]=result_s
@@ -47,5 +54,7 @@ class ReportAgent(BaseAgent):
         self.youtube_report.set_value(self.result_dict)
         self.review_report.set_value(self.result_dict)
         self.specification_report.set_value(self.result_dict)
+        self.purchase_report.set_value(self.result_dict)
+        self.last_report=self.result
         return self.result_dict
         

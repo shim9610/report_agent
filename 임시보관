@@ -44,3 +44,15 @@ Upstage API key is successfully set.
                                            'title': '막 나가는(?) 애플의 11만 9천원짜리 애플 펜슬 USB-C 사 왔습니다',
                                            'views': '307K views'},
                           'subscribers': '78.8만 명'}}}
+
+
+
+                  
+{"middleware": {"query" : "유저 요청 사항",
+            "product name" : "제품명",
+            "question" : ["질문에이전트 결과 리스트에 감싸서 입력"],
+            "youtube" : ["유튜브 에이전트 결과 리스트에 감싸서 입력"],
+            "review" : ["리뷰 에이전트 결과 리스트에 감싸서 입력"],
+            "specification" : ["제품 정보 분석 에이전트 결과 리스트에 감싸서 입력"],
+            }
+        }
