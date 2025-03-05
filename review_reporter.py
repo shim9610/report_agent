@@ -114,8 +114,8 @@ async def test_review_main():
     except Exception as e:
         print(e)
         print(f"오류가 발생했습니다.반환값:{result[0]}")
-    import pprint
-    pprint.pprint(result_dict, width=150)
+    #import pprint
+    #pprint.pprint(result_dict, width=150)
     return general_users, []
 
 async def review_main(input,query):
@@ -131,8 +131,8 @@ async def review_main(input,query):
     except Exception as e:
         print(e)
         print(f"오류가 발생했습니다.반환값:{result[0]}")
-    import pprint
-    pprint.pprint(result_dict, width=150)
+    #import pprint
+    #pprint.pprint(result_dict, width=150)
     return general_users, response
 
 
