@@ -1,15 +1,18 @@
 from utility import Node
 import re
 from template_generator import ResultTemplate, Product, Reviews, Purchase_Info_Stores
-from bsae_repoter import BaseRepoter
+from bsae_reporter import BaseReporter
 from dummy import get_review_data_real_dummy
-class ReviewRepoter(BaseRepoter):
+
+
+class ReviewReporter(BaseReporter):
     def __init__(self,input,query):
         script=[]
         script.append('현재 첫번째 시도입니다.')
         script.append('두번째 시도입니다. 다음 질문과 함꼐 다시 생각해 보세요,')
         script.append('세번째 시도입니다. 이전의 질의 응답과 함꼐 다시 생각해 보세요,')
-        script.append('이번이 마지막 시도입니다. 이전의 질의 응답과 함꼐 다시 생각해 보세요, 이번엔 질문을 반환하지 않고 나머지 값을 최대한 채워서 반환합니다.')
+        script.append('이번이 마지막 시도입니다. 이전의 질의 응답과 함꼐 다시 생각해 보세요, 이번엔 질문을 반환하지 않고 나머지 값을 최대한 채워서 반환합니다. 마지막 반환 시에는 반드시 데이터를 확인하고 채울 수 있는데 채우지 않은 항목이 있는지 꼼꼼히 확인합니다.')
+        required_keyt=["general_users.total_reviews","general_users.positive_percentage","general_users.negative_percentage","general_users.positive_reviews","general_users.negative_reviews","general_users.negative_reviews","general_users.user_comments"]
         table_content="""
                             ### 🔹 일반 사용자 리뷰 (`general_users`)
 
@@ -26,7 +29,7 @@ class ReviewRepoter(BaseRepoter):
             
                         """
         prompt=f""" 당신은 분석 전문가입니다 아주 조금의 데이터만으로 필요한 정보를 찾아내는 달인입니다.
-                            이번에는 댓글에서 추출된 데이터로 유저 요청에 최대한 관련된 부분을 추려서 다음 양식의 테이블을 작성하려 합니다. 만약 유저가 유튜브 영상을찾거나 리뷰를 찾더라도 마찬가지입니다 당신은 전문가로써 어떤 부분에 관심이 있는지를 캐치해서 
+                            이번에는 댓글에서 추출된 데이터로 유저 요청에 최대한 관련된 부분을 추려서 다음 양식의 테이블을 작성하려 합니다. 만약 유저가 유튜브 영상을찾거나 리뷰를 찾더라도 마찬가지입니다 당신은 전문가로써 어떤 부분에 관심이 있는지를 추적해서 
                             아래의 테이블의 내용을 채워야만 합니다.
                             {table_content}
                             <작성 규약>
@@ -44,8 +47,8 @@ class ReviewRepoter(BaseRepoter):
                             [[general_users.negative_percentage::부정 리뷰 비율]], [[general_users.positive_reviews::긍정적인 리뷰 예시]], 
                             [[general_users.negative_reviews::부정적인 리뷰 예시]], [[general_users.user_comments::실제 사용자 댓글]]
                             최종적으로 비어있는 내용이있는지 확인합니다 만약 비어있는 내용이 있다면 스스로에게 질문을 던지고 질문은 다음양식으로 반환해야합니다. [[selfquestion::질문내용]] 내용이 완전하다면 질문은 반환하지 않습니다.질문은 매번 새로운 질문으로 변화를 줍니다.
-                            최종 시도에서는 비어있는 내용이 있다 하더라도 질문은 반환하지 않고, 나머지 값은 그대로 출력합니다.
-                            반환은 추가 문구 없이 결과한 반환합니다. 또한 위의 양식을 준수합니다.
+                            최종 시도에서는 비어있는 내용이 있다 하더라도 질문은 반환하지 않고, 나머지 값은 그대로 출력합니다. 마지막 반환 시에는 반드시 데이터를 확인하고 채울 수 있는데 채우지 않은 항목이 있는지 꼼꼼히 확인합니다.
+                            다시한번 해당항목들{required_keyt}이 모두 채워졌는지 확인하고 반환은 추가 문구 없이 결과한 반환합니다. 또한 위의 양식을 준수합니다.
                             """
         ##############################################
         data=input
@@ -61,6 +64,11 @@ class ReviewRepoter(BaseRepoter):
                     리뷰 집계 데이터:{data}
 
         """
+        cachepath="review_cache.h5"
+        find_dict={data["product_name"].replace(" ",""):[]}
+        cache_key=data["product_name"].replace(" ","")
+        require_key=required_keyt
+        reject_key=None
         #####################################################################
         super().__init__(
             data=data,
@@ -74,6 +82,11 @@ class ReviewRepoter(BaseRepoter):
             selfquestion=selfquestion,
             selfanswer=selfanswer,
             context=context,
+            cachepath=cachepath,
+            find_dict=find_dict,
+            cache_key=cache_key,
+            require_key=require_key,
+            reject_key=reject_key
         )
 def get_general_users_dummy():
     return {
@@ -89,8 +102,8 @@ def get_general_users_dummy():
 async def test_review_main():
     input=get_review_data_real_dummy()
     query="애플의 아이패드 디지털 드로잉에 적합한 제품 리뷰 영상이 필요합니다. 우수한 펜 반응속도와 고급형 프로세서를 탑재한 제품에 관한 정보가 포함된 클립이 있으면 좋겠으며 예산은 100만원입니다. 이 영상에서는 해당 제품의 기능 요약 및 인상적인 장면, 사용자 리뷰 등의 정보를 제공해주길 원합니다."
-    repoter=ReviewRepoter(input,query)
-    result,response=repoter.get_response()
+    reporter=ReviewReporter(input,query)
+    result,response=reporter.get_response()
     generator = ResultTemplate()
     result_dict = generator.dict
     item_review=Reviews()
@@ -106,8 +119,8 @@ async def test_review_main():
     return general_users, []
 
 async def review_main(input,query):
-    repoter=ReviewRepoter(input,query)
-    result,response=repoter.get_response()
+    reporter=ReviewReporter(input,query)
+    result,response=reporter.get_response()
     generator = ResultTemplate()
     result_dict = generator.dict
     item_review=Reviews()

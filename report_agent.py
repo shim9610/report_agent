@@ -1,9 +1,9 @@
 from main_test import main
 from base import BaseAgent
 from template_generator import ResultTemplate, Product, Reviews, Purchase_Info_Stores
-from youtube_repoter import youtube_main
-from review_repoter import review_main
-from sepcification_repoter import sepcification_main
+from youtube_reporter import youtube_main
+from review_reporter import review_main
+from sepcification_reporter import sepcification_main
 import asyncio
 from typing import Dict, Any
 from abc import ABC, abstractmethod
@@ -55,6 +55,6 @@ class ReportAgent(BaseAgent):
         self.review_report.set_value(self.result_dict)
         self.specification_report.set_value(self.result_dict)
         self.purchase_report.set_value(self.result_dict)
-        self.last_report=self.result
+        self.last_report=self.result_dict
         return self.result_dict
         

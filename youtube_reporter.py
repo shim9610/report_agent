@@ -1,16 +1,17 @@
 from utility import Node
 import re
-from dummy import get_dummy
+from dummy import get_youtube_data_dummy
 from template_generator import ResultTemplate, Product, Reviews, Purchase_Info_Stores
-from bsae_repoter import BaseRepoter
+from bsae_reporter import BaseReporter
 
-class YoutubeRepoter(BaseRepoter):
+class YoutubeReporter(BaseReporter):
     def __init__(self,input):
         script=[]
         script.append('현재 첫번째 시도입니다.')
         script.append('두번째 시도입니다. 다음 질문과 함꼐 다시 생각해 보세요,')
         script.append('세번째 시도입니다. 이전의 질의 응답과 함꼐 다시 생각해 보세요,')
-        script.append('이번이 마지막 시도입니다. 이전의 질의 응답과 함꼐 다시 생각해 보세요, 이번엔 질문을 반환하지 않고 나머지 값을 최대한 채워서 반환합니다.')
+        require_key=["youtuber.views","youtuber.time_since_upload","youtuber.timestamp1","youtuber.timestamp1_description","youtuber.opinion","youtuber.opinion_reason","youtuber.pros","youtuber.cons","youtuber.link"]
+        script.append('이번이 마지막 시도입니다. 이전의 질의 응답과 함꼐 다시 생각해 보세요, 이번엔 질문을 반환하지 않고 나머지 값을 최대한 채워서 반환합니다. 무슨일이있어도 질문과 통상적인 답변을 반환하지 않으며 지정된 형식의 출력만을 반환합니다. 자료가 모자라더라도 최대한 채워서 반환합니다.')
         table_content="""
                         ### 🔹 유튜버 리뷰 (`youtuber`)
                         | 입력 변수명 | 설명 | 입력 예시 |
@@ -52,7 +53,7 @@ class YoutubeRepoter(BaseRepoter):
                             ,[[youtuber.opinion::유튜버 최종 의견 결과]],[[youtuber.opinion_reason::추천 또는 비추천 이유 결과]],
                             [[youtuber.pros::장점 리스트 결과]],[[youtuber.cons::단점 리스트 결과]],[[youtuber.link::리뷰 영상 링크 결과]]
                             최종적으로 비어있는 내용이있는지 확인합니다 만약 비어있는 내용이 있다면 스스로에게 질문을 던지고 질문은 다음양식으로 반환해야합니다. [[selfquestion::질문내용]] 내용이 완전하다면 질문은 반환하지 않습니다.질문은 매번 새로운 질문으로 변화를 줍니다.
-                            최종 시도에서는 비어있는 내용이 있다 하더라도 질문은 반환하지 않고, 나머지 값은 그대로 출력합니다.
+                            최종 시도에서는 비어있는 내용이 있다 하더라도 질문은 반환하지 않고, 나머지 값은 그대로 출력합니다.특히 {require_key}의 내용은 반드시 더 신경써서 채워야 합니다.
                             반환은 추가 문구 없이 결과한 반환합니다.
                             """
         
@@ -70,6 +71,11 @@ class YoutubeRepoter(BaseRepoter):
                     video_metadata:{data['raw_meta_data']}
                     LLM_process_data:{data['llm_process_data']}
         """
+        cachepath="youtube_cache.h5"
+        find_dict={section1["제목"].replace(" ",""):[]}
+        cache_key=section1["제목"].replace(" ","")
+        reject_key=None
+        
         super().__init__(
             data=data,
             section1=section1,
@@ -82,11 +88,16 @@ class YoutubeRepoter(BaseRepoter):
             selfquestion=selfquestion,
             selfanswer=selfanswer,
             context=context,
+            cachepath=cachepath,
+            find_dict=find_dict,
+            cache_key=cache_key,
+            require_key=require_key,
+            reject_key=reject_key 
         )
 async def test_youtube_main():
-    input=get_test_dummy()
-    repoter=YoutubeRepoter(input)
-    result,response=repoter.get_response()
+    input=get_youtube_data_dummy()
+    reporter=YoutubeReporter(input)
+    result,response=reporter.get_response()
     item_review=Reviews()
     youtuber=item_review.youtuber
     try:
@@ -96,8 +107,8 @@ async def test_youtube_main():
         print(f"오류가 발생했습니다.반환값:{result[0]}")
     return youtuber, result
 async def youtube_main(input):
-    repoter=YoutubeRepoter(input)
-    result,response=repoter.get_response()
+    reporter=YoutubeReporter(input)
+    result,response=reporter.get_response()
     item_review=Reviews()
     youtuber=item_review.youtuber
     try:

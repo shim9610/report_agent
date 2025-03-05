@@ -2,7 +2,7 @@ from utility import Node
 import re
 from dummy import get_test_dummy
 from template_generator import ResultTemplate, Product, Reviews, Purchase_Info_Stores
-from bsae_repoter import BaseRepoter
+from bsae_reporter import BaseReporter
 test_set = {'제품명':'APPLE 2024 iPad mini A17 Pro 7세대', 
     '가격': 749000, 
         '추천 이유': {'pros': ['장점 1', '장점 2', '장점 3'], 'cons': ['단점 1', '단점 2', '단점 3']}, 
@@ -46,13 +46,14 @@ flat_dict = {
     "charging_port.limitation": "라이트닝 미지원",
     "charging_port.description": "기존 아이폰 충전기 사용 불가, 데이터 전송 속도 제한"
 }
-class SpecificationRepoter(BaseRepoter):
+class SpecificationReporter(BaseReporter):
     def __init__(self,input,query):
         script=[]
         script.append('현재 첫번째 시도입니다.')
         script.append('두번째 시도입니다. 다음 질문과 함꼐 다시 생각해 보세요,')
         script.append('세번째 시도입니다. 이전의 질의 응답과 함꼐 다시 생각해 보세요,')
         script.append('이번이 마지막 시도입니다. 이전의 질의 응답과 함꼐 다시 생각해 보세요, 이번엔 질문을 반환하지 않고 나머지 값을 최대한 채워서 반환합니다. 단 채울 값이 없다고 해서 관런없는 예시의 값을 채워서는 안됩니다. 정보가 없다면 관련 정보 없음으로 채우십시오, 자료에서 확인되지 않은 사실 또한 써서는 안됩니다.')
+        require_key=["display.size","display.resolution","display.refresh_rate","display.description","processor.model","processor.equivalent","processor.description","storage.options","storage.expandable","storage.description","battery.capacity","battery.description","design.features","design.description","color_options.color_options","pencil_support.supported","pencil_support.charging","pencil_support.description","charging_port.type","charging_port.limitation","charging_port.description","recommendation.name","recommendation.category","recommendation.main_reason","recommendation.sub_reason","recommendation.good_person","recommendation.bad_person","site","option","price","purchase_link","rating"]
         table_content="""
                     ## 📌 Product 클래스
 
@@ -127,7 +128,7 @@ class SpecificationRepoter(BaseRepoter):
                     [[recommendation.main_reason::주요 추천 이유]],[[recommendation.sub_reason::부가적인 추천 이유]],[[recommendation.good_person::추천 대상 리스트]],[[recommendation.bad_person::추천하지 않는 대상 리스트]]]
                     [[site::판매 사이트]],[[option::제품 옵션]],[[price::가격]],[[purchase_link::구매 링크]],[[rating::판매처 평점]]
                     최종적으로 비어있는 내용이있는지 확인합니다 만약 비어있는 내용이 있다면 스스로에게 질문을 던지고 질문은 다음양식으로 반환해야합니다. [[selfquestion::질문내용]] 내용이 완전하다면 질문은 반환하지 않습니다.질문은 매번 새로운 질문으로 변화를 줍니다.
-                    최종 시도에서는 비어있는 내용이 있다 하더라도 질문은 반환하지 않고, 나머지 값은 그대로 출력합니다.
+                    최종 시도에서는 비어있는 내용이 있다 하더라도 질문은 반환하지 않고, 나머지 값은 그대로 출력합니다. 하지만 {require_key}의 내용은 반드시 더 신경써서 채워야 합니다.
                     반환은 추가 문구 없이 결과한 반환합니다.
                     """
         ##############################################
@@ -142,6 +143,10 @@ class SpecificationRepoter(BaseRepoter):
                     다음은 테이블을 채우기 위해 제공되는 정보들입니다.
                     제품 스펙 및 전문가 소견 : {data}
         """
+        cachepath="Specification_cache.h5"
+        find_dict={data["제품명"].replace(" ",""):[]}
+        cache_key=data["제품명"].replace(" ","")
+        reject_key=None
         #####################################################################
         super().__init__(
             data=data,
@@ -155,13 +160,18 @@ class SpecificationRepoter(BaseRepoter):
             selfquestion=selfquestion,
             selfanswer=selfanswer,
             context=context,
+            cachepath=cachepath,
+            find_dict=find_dict,
+            cache_key=cache_key,
+            require_key=require_key,
+            reject_key=reject_key
         )
 
 async def test_sepcification_main(): 
     input=test_set
     query = "애플의 아이패드 디지털 드로잉에 적합한 제품 리뷰 영상이 필요합니다. 우수한 펜 반응속도와 고급형 프로세서를 탑재한 제품에 관한 정보가 포함된 클립이 있으면 좋겠으며 예산은 100만원입니다. 이 영상에서는 해당 제품의 기능 요약 및 인상적인 장면, 사용자 리뷰 등의 정보를 제공해주길 원합니다."
-    repoter=SpecificationRepoter(input,query)
-    result,response=repoter.get_response()
+    reporter=SpecificationReporter(input,query)
+    result,response=reporter.get_response()
     PurchaseKey=["site","option","price","purchase_link","rating"]
     Purchase = {}
     for key in PurchaseKey:
@@ -188,8 +198,8 @@ async def test_sepcification_main():
     pprint.pprint(result_dict, width=150) 
     return item_product, []
 async def sepcification_main(input,query): 
-    repoter=SpecificationRepoter(input,query)
-    result,response=repoter.get_response()
+    reporter=SpecificationReporter(input,query)
+    result,response=reporter.get_response()
     PurchaseKey=["site","option","price","purchase_link","rating"]
     Purchase = {}
     for key in PurchaseKey:
@@ -210,12 +220,12 @@ async def sepcification_main(input,query):
     output={}
     output['Purchase']=Purchase_Info
     output['Product']=item_product
-    return output, repoter
+    return output, reporter
 
 if __name__ == "__main__":
     #input=get_test_dummy()
-    #repoter=SpecificationRepoter(input)
-    #result,response=repoter.get_response()
+    #reporter=SpecificationReporter(input)
+    #result,response=reporter.get_response()
     #generator = ResultTemplate()
     #result_dict = generator.dict
     #item_product=Product()

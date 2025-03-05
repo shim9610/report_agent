@@ -1,7 +1,7 @@
 import asyncio
-from youtube_repoter import test_youtube_main
-from review_repoter import test_review_main
-from sepcification_repoter import test_sepcification_main
+from youtube_reporter import test_youtube_main
+from review_reporter import test_review_main
+from sepcification_reporter import test_sepcification_main
 from template_generator import ResultTemplate, Product, Reviews
 async def main():
     (youtube,result_y),(rewivew,result_r),(specification,result_s)=await asyncio.gather(
